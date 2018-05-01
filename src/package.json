@@ -1,0 +1,13 @@
+{
+	"name": "ShinyCWP",
+	"version": "1.1.0430.3",
+	"main": "index.html",
+	"window": {
+		"width": 1067,
+		"height": 601,
+		"frame": true,
+		"title": "Idolm@ster Shiny Colors (Unofficial Client) [BETA]",
+		"icon": "shanicon.png"
+	},
+	"bg-script": "hiori/background.js"
+}

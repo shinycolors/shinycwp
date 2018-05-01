@@ -1,0 +1,121 @@
+/* Resets basicos de estilo */
+
+*
+{
+	margin: 0;
+	padding: 0;
+	border: none;
+	box-sizing: border-box;
+}
+
+html, body, iframe
+{
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+	/* If not have network connection, the hide animation looks bad with white background */
+	background-color: black;
+}
+
+/* Styles for preload screen message */
+#pre-message
+{
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	padding-top: 6%;
+	padding-left: 10%;
+	padding-right: 10%;
+	text-align: center;
+	font-family: sans-serif;
+	color: white;
+	background-color: #1f1f1f;
+
+	z-index: 99;
+
+	user-select: none;
+	pointer-events: none;
+
+	/* Animation */
+	transition: opacity 2s ease-out, 
+				visibility 2001ms step-end;
+
+	/* Animated properties */
+	opacity: 1;
+	visibility: visible;
+}
+
+#pre-message.hide
+{
+	opacity: 0;
+	visibility: hidden;
+}
+
+#pre-message > *
+{
+	padding-top: 10px;
+	padding-bottom: 10px;
+}
+
+#pre-message a
+{
+	color: #33e1ff;
+	pointer-events: auto;
+}
+
+#pre-message > h1
+{
+	margin-bottom: 100px;
+	font-size: 30px;
+}
+#pre-message > p
+{
+	font-size: 17px;
+}
+#pre-message > small
+{
+	position: absolute;
+	width: 70%;
+	left: 15%;
+	right: auto;
+	bottom: 0;
+}
+
+/* Styles for OSD */
+div#overlay {
+	position: absolute;
+	top: 0;
+	left: 0;
+	pointer-events: none;
+	z-index: 99;
+
+	/* Deny interaction events */
+	user-drag: none;
+	user-select: none;
+	-webkit-user-drag: none;
+
+	/* Animation properties */
+	visibility: visible;
+	
+	transition: opacity 250ms ease-out, top 250ms, visibility 0s;
+}
+
+div#overlay.hide {
+	transition: opacity 450ms ease-out, top 250ms, visibility 451ms step-end;
+
+	/* Animation properties */
+	top: -18px;
+	opacity: 0;
+	visibility: hidden;
+}
+
+#overlay > span.message {
+	display: inline-block;
+	margin-left: 15px;
+	margin-top: 10px;
+	color: #fff;
+	font-size: 1.6em;
+	font-family: sans-serif;
+	font-weight: bold;
+	text-shadow: 0 0 3px rgba(0, 0, 0, 0.8), 0 0 6px rgba(0, 0, 0, 0.4);
+}

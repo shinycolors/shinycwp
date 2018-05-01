@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="es">
+	<head>
+		<meta charset="utf-8">
+		<link rel="stylesheet" type="text/css" href="css/styles.css">
+		<script type="text/javascript">var win = nw.Window.get();</script>
+	</head>
+
+	<body>
+		<div id="overlay" class="hide">
+			<span class="message"></span>
+		</div>
+
+		<div id="pre-message">
+			<h1>ShinyCWP</h1>
+
+			<p>Thanks for using the beta.</p> 
+			<p>Please note this is just a browser with extended functionality.
+				<br>This software uses a third party japanese proxy, so be aware that,
+				<br>while we DO NOT collect any data, we can't prevent proxy doing such (worst of cases).
+			</p>
+		
+			<p>Have fun.<br>— ShinyCWP dev team.</p>
+
+			<small>Read full disclaimer at: <a onclick="nw.Shell.openExternal(this.href); return false;" href="https://github.com/shinycwp/scwp">https://github.com/shinycwp/scwp</a>
+				<br>This client uses <a onclick="nw.Shell.openExternal(this.href); return false;" href="https://github.com/shinycolors/hiori">Hiori</a>, a fanmade and really cool Chrome extension that will help you with in-game translations.
+			</small>
+		</div>
+
+		<iframe id="iframe" scrolling="no" nwfaketop></iframe>
+		<script type="text/javascript" src="js/OSD.js"></script>
+		<script type="text/javascript" src="js/inyect.js"></script>
+	</body>
+</html>
