@@ -17,6 +17,165 @@ html, body, iframe
 	background-color: black;
 }
 
+body {
+	border: 1px solid #749dc5;
+	border-top: none;
+}
+
+/* App font */
+@font-face {
+	font-family: "nwapp-icons";
+	src: url("/fonts/nwapp-icons.woff") format("woff"),
+		url("/fonts/nwapp-icons.ttf") format("truetype"),
+		url("/fonts/nwapp-icons.svg#nwapp-icons") format("svg");
+	font-weight: normal;
+	font-style: normal;
+}
+
+[data-icon]:before {
+	font-family: "nwapp-icons" !important;
+	content: attr(data-icon);
+	font-style: normal !important;
+	font-weight: normal !important;
+	font-variant: normal !important;
+	text-transform: none !important;
+	speak: none;
+	line-height: 1;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+[class^="icon-"]:before,
+[class*=" icon-"]:before {
+	font-family: "nwapp-icons" !important;
+	font-style: normal !important;
+	font-weight: normal !important;
+	font-variant: normal !important;
+	text-transform: none !important;
+	speak: none;
+	line-height: 1;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	overflow: hidden;
+}
+
+.icon-close:before { content: "\62"; }
+.icon-fullscreen:before { content: "\66"; }
+.icon-minimize:before { content: "\69"; }
+.icon-refresh:before { content: "\72"; }
+.icon-config:before { content: "\63"; }
+
+
+
+/* Styles for titlebar */
+iframe#iframe {
+	margin-top: 22px;
+	height: calc(100vh - 22px);
+}
+
+div#menu-bar {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+
+	height: 23px;
+	width: 100%;
+
+	background: #e3f0ff;
+	/*background: linear-gradient(
+		90deg, rgba(163,241,242,1) 0%, 
+		rgba(238,252,169,1) 25%, 
+		rgba(250,206,177,1) 50%, 
+		rgba(235,240,157,1) 75%, 
+		rgba(158,233,247,1) 100%);*/
+
+	background: linear-gradient(90deg, 
+		rgba(250,251,188,1) 0%, 
+		rgba(227,210,247,1) 40%, 
+		rgba(243,207,239,1) 66%, 
+		rgba(166,236,237,1) 100%);
+	border-bottom: 1px solid #8593ad;
+
+	-webkit-app-region: drag;
+
+	transition: top 340ms ease-out;
+	z-index: 765;
+}
+
+#menu-bar .title {
+	font-family: sans-serif;
+	font-size: 13px;
+	padding: 3px;
+	text-align: center;
+	color: #616161;
+	text-shadow: 0 0 2px rgb(255, 248, 237);
+}
+
+#menu-bar .buttons {
+	position: absolute;
+	top: 0;
+
+	-webkit-app-region: no-drag;
+}
+
+#menu-bar .buttons.right {
+	right: 0;
+	margin-right: 6px;
+	font-size: 0;
+}
+
+#menu-bar .buttons.left {
+	left: 0;
+	margin-left: 6px;
+	font-size: 0;
+}
+
+#menu-bar .buttons.right span {
+	margin-right: 2px;
+}
+
+#menu-bar .buttons.left span {
+	margin-left: 2px;
+}
+
+#menu-bar .buttons span {
+	padding: 4px 5px 0px 4px;
+	display: inline-block;
+	cursor: pointer;
+	background: rgba(255, 255, 255, 0.1);
+	font-size: 13px;
+	width: 22px;
+	overflow: hidden;
+	color: #7d776b;
+}
+
+#menu-bar .buttons span:hover {
+	background: rgba(255, 255, 255, 0.5);
+}
+
+/* Fullscreen fixes */
+.fullscreen div#menu-bar {
+	top: -23px;
+}
+
+.fullscreen.stub:hover + div#menu-bar:hover {
+	top: 0;
+}
+
+.fullscreen iframe#iframe {
+	height: 100%;
+	margin: 0;
+}
+
+.fullscreen div#overlay {
+	margin-top: 0;
+}
+
+body.fullscreen {
+	border: none !important;
+}
+
 /* Styles for preload screen message */
 #pre-message
 {
@@ -43,6 +202,8 @@ html, body, iframe
 	/* Animated properties */
 	opacity: 1;
 	visibility: visible;
+
+	margin-left: -1px;
 }
 
 #pre-message.hide
@@ -88,6 +249,7 @@ div#overlay {
 	left: 0;
 	pointer-events: none;
 	z-index: 99;
+	margin-top: 23px;
 
 	/* Deny interaction events */
 	user-drag: none;
@@ -118,4 +280,72 @@ div#overlay.hide {
 	font-family: sans-serif;
 	font-weight: bold;
 	text-shadow: 0 0 3px rgba(0, 0, 0, 0.8), 0 0 6px rgba(0, 0, 0, 0.4);
+}
+
+/* Style for config dialog */
+#menu-bar #config {
+	position: absolute;
+	top: 30px;
+	padding: 9px;
+	left: 0;
+	width: 320px;
+	height: auto;
+	background: white;
+	border-radius: 0 0 5px 5px;
+	color: #546d71;
+	font-family: sans-serif;
+
+	cursor: auto;
+}
+
+#menu-bar #config input[type="text"] {
+	padding: 6px 9px 4px 9px;
+	border: 1px solid lightgray;
+	border-radius: 3px;
+	width: 100%;
+}
+
+#menu-bar #config:before {
+	content: '';
+	width: 0;
+	height: 0;
+	border-left: 7px solid transparent;
+	border-right: 7px solid transparent;
+	border-bottom: 7px solid white;
+	position: absolute;
+	top: -6px;
+	left: 8px;
+}
+
+#menu-bar #config > div.row {
+	margin-bottom: 7px;
+}
+
+#menu-bar #config p {
+	font-size: 12px;
+	margin-bottom: 12px;
+}
+
+#menu-bar #config h3 {
+	width: 100%;
+	margin-bottom: 4px;
+	border-bottom: 1px solid #eee;
+}
+
+#menu-bar #config .icon-config { width: auto; }
+
+button.button {
+	padding: 8px 14px;
+	color: red;
+	font-weight: bold;
+	background: transparent;
+	border: 1px solid red;
+	border-radius: 4px;
+	cursor: pointer;
+	transition: 300ms;
+}
+
+button.button:hover {
+	color: white;
+	background: #e64848;
 }

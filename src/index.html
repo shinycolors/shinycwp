@@ -7,6 +7,48 @@
 	</head>
 
 	<body>
+		<div id="menu-bar">
+			<div class="title">Idolm@ster Shiny Colors - ShinyCWP <span id="title-version"></span></div>
+			<div class="buttons left">
+				<span><a class="icon-config" style="cursor:pointer; text-decoration: none; color: inherit;" onclick="toggle_config()"></a>
+					<div id="config" style="display: none;">
+						<p>NOTE: Config on the proxy section won't be applied until you restart the app.</p>
+						<h3>Proxy configuration</h3>
+						<div>
+							<p>If you have your own proxy or vpn set, you may disable this option to save traffic redirection and/or improve the speed.</p>
+							<label>
+								<input type="checkbox" config-area="proxy" config-property="active">
+								Activate proxy
+							</label>
+						</div>
+						<h3>Browser data</h3>
+						<div>
+							<p>Please keep the Shift key pressed when clicking the button to apply the action.<br>Window may be reloaded after process is done.</p>
+							<label>
+								<button class="button danger" config-custom="delete-cookies">Delete cookies</button>
+							</label>
+						</div>
+						<!-- <div>
+							<label>
+								<input type="checkbox" config-area="proxy" config-custom="allow-custom-proxy">
+								Use custom proxy
+							</label>
+							<label config-disabled="">
+								<input type="text" config-area="proxy" config-property="custom" placeholder="ip:port">
+							</label>
+						</div> -->
+					</div>
+				</span>
+				<span class="icon-refresh" onclick="reload_iframe()"></span>
+			</div>
+			<div class="buttons right">
+				<span class="icon-minimize" onclick="win.minimize()"></span>
+				<span class="icon-fullscreen" onclick="toggle_fs()"></span>
+				<!-- <span class="icon-max" onclick=""></span> -->
+				<span class="icon-close" onclick="nw.App.quit()"></span>
+			</div>
+		</div>
+
 		<div id="overlay" class="hide">
 			<span class="message"></span>
 		</div>
@@ -22,12 +64,13 @@
 		
 			<p>Have fun.<br>— ShinyCWP dev team.</p>
 
-			<small>Read full disclaimer at: <a onclick="nw.Shell.openExternal(this.href); return false;" href="https://github.com/shinycwp/scwp">https://github.com/shinycwp/scwp</a>
+			<small>Read full disclaimer at: <a onclick="nw.Shell.openExternal(this.href); href="https://github.com/shinycolors/shinycwp">https://github.com/shinycolors/shinycwp</a>
 				<br>This client uses <a onclick="nw.Shell.openExternal(this.href); return false;" href="https://github.com/shinycolors/hiori">Hiori</a>, a fanmade and really cool Chrome extension that will help you with in-game translations.
 			</small>
 		</div>
 
 		<iframe id="iframe" scrolling="no" nwfaketop></iframe>
+		<script type="text/javascript" src="js/config.js"></script>
 		<script type="text/javascript" src="js/OSD.js"></script>
 		<script type="text/javascript" src="js/inyect.js"></script>
 	</body>
