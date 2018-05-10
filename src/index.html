@@ -15,15 +15,23 @@
 						<p>NOTE: Config on the proxy section won't be applied until you restart the app.</p>
 						<h3>Proxy configuration</h3>
 						<div>
-							<p>If you have your own proxy or vpn set, you may disable this option to save traffic redirection and/or improve the speed.</p>
+							<p>If you have your own proxy or VPN set, you may disable this option to save traffic redirection and/or improve the speed.</p>
 							<label>
 								<input type="checkbox" config-area="proxy" config-property="active">
 								Activate proxy
 							</label>
 						</div>
+						<h3>Sound configuration</h3>
+						<div>
+							<p>Game sounds usually mute when you leave the window. Here you can change that. (Usefull for Always-on-top mode).</p>
+							<label>
+								<input type="checkbox" config-area="sound" config-property="afk_mute">
+								Mute sound on AFK
+							</label>
+						</div>
 						<h3>Browser data</h3>
 						<div>
-							<p>Please keep the Shift key pressed when clicking the button to apply the action.<br>Window may be reloaded after process is done.</p>
+							<p>Please keep the Shift key pressed when clicking the button to apply the action.<br>Game may be reloaded after process is done.</p>
 							<label>
 								<button class="button danger" config-custom="delete-cookies">Delete cookies</button>
 							</label>
@@ -42,6 +50,7 @@
 				<span class="icon-refresh" onclick="reload_iframe()"></span>
 			</div>
 			<div class="buttons right">
+				<span class="icon-pin" onclick="toggle_aot()"></span>
 				<span class="icon-minimize" onclick="win.minimize()"></span>
 				<span class="icon-fullscreen" onclick="toggle_fs()"></span>
 				<!-- <span class="icon-max" onclick=""></span> -->
@@ -57,19 +66,26 @@
 			<h1>ShinyCWP</h1>
 
 			<p>Thanks for using the beta.</p> 
-			<p>Please note this is just a browser with extended functionality.
-				<br>This software uses a third party japanese proxy, so be aware that,
+
+			<p>You're advised NOT to use your main account as we aren't yet sure what does Enza/Bamco think about the translation mod or the client. In any case, use <b>at your own risk</b>.</p>
+			<p>Also, please note this software uses a third party japanese proxy, so be aware that,
 				<br>while we DO NOT collect any data, we can't prevent proxy doing such (worst of cases).
 			</p>
 		
 			<p>Have fun.<br>— ShinyCWP dev team.</p>
 
-			<small>Read full disclaimer at: <a onclick="nw.Shell.openExternal(this.href); href="https://github.com/shinycolors/shinycwp">https://github.com/shinycolors/shinycwp</a>
-				<br>This client uses <a onclick="nw.Shell.openExternal(this.href); return false;" href="https://github.com/shinycolors/hiori">Hiori</a>, a fanmade and really cool Chrome extension that will help you with in-game translations.
+			<small>Read full disclaimer at:
+				<a onclick="nw.Shell.openExternal(this.href); return false;" 
+					href="https://github.com/shinycolors/shinycwp">https://github.com/shinycolors/shinycwp</a>
+
+				<br>This client uses
+					<a onclick="nw.Shell.openExternal(this.href); return false;" 
+					href="https://github.com/shinycolors/hiori">Hiori</a>,
+					a fanmade and really cool Chrome extension that will help you with in-game translations.
 			</small>
 		</div>
 
-		<iframe id="iframe" scrolling="no" nwfaketop></iframe>
+		<iframe draggable="false" id="iframe" scrolling="no" nwfaketop></iframe>
 		<script type="text/javascript" src="js/config.js"></script>
 		<script type="text/javascript" src="js/OSD.js"></script>
 		<script type="text/javascript" src="js/inyect.js"></script>
