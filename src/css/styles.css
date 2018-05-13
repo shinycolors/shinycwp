@@ -172,6 +172,10 @@ div#menu-bar {
 	margin-top: 0;
 }
 
+.fullscreen #menu-bar #config {
+	display: none !important;
+}
+
 body.fullscreen {
 	border: none !important;
 }
@@ -332,7 +336,9 @@ div#overlay.hide {
 	margin-bottom: 10px;
 }
 
-#menu-bar #config > div {
+#menu-bar #config > div,
+#menu-bar #config > div > label {
+	display: block;
 	margin-bottom: 12px;
 }
 

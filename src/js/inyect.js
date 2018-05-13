@@ -1,28 +1,60 @@
+// Node libraries
+const fs = require("fs");
+
 document.getElementById('title-version').innerText = nw.App.manifest.version;
 
-// Adquire config so it can be applied to every element on init
+// Adquire config so it can be applied to any element on init
 var config = SCWP.config.get_all();
 
+var proxy_changed = false;
+var valid_ipv4 = /^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(?:\:[\d]{1,6})?$/g;
+
+var bench_start = Date.now(); // [!DEBUG]
+
 // If the proxy is active in the config...
-if ( config.proxy.active )
+function proxyConfig( config_obj )
 {
-	// Base network setup for all app connections.
-	nw.App.setProxyConfig("", chrome.extension.getURL("ShinyColors.pac"));
+	if ( config_obj.active )
+	{
+		// Base load url using built-in proxy.
+		var load_url = chrome.extension.getURL("ShinyColors.pac");
+
+		// If the user has set it's own proxy...
+		if ( config_obj.custom )
+		{
+			// Read the custom template and replace the "[CUSTOM]" with proxy.
+			let content = fs.readFileSync("customPAC.pac", "UTF-8");
+			content = content.replace("[CUSTOM]", config_obj.custom);
+
+			// Convert to url data using browser native base64 encoder.
+			load_url =  'data:text/json;base64,' + btoa(content);
+			content = null; // unload content
+		}
+
+		// Load the url to the NW.js proxy config entry.
+		nw.App.setProxyConfig("", load_url);
+	}
 }
 
-// [!REV]
-// Function to change the proxy in execution time. yet to be implemented.
-// Needs some care with the window, as it would leak info from one time to another.
+proxyConfig(config.proxy);
+
+console.log("Proxy config took " + (Date.now() - bench_start) + " ms to load"); // [!DEBUG]
+
 function handleProxyChange() {
+	// Always retrieve last version.
 	var proxy_config = SCWP.config.get("proxy");
 
-	// Might also want to make a custom pac using blobs in order to set a custom proxy.
-
-	if ( proxy_config.active )
-	{
-		nw.App.setProxyConfig("", chrome.extension.getURL("ShinyColors.pac"));
-	}
+	if ( proxy_config.active ) { proxyConfig(proxy_config); }
 	else { nw.App.setProxyConfig(""); }
+
+	var event = new CustomEvent('osd-message', {
+		detail: { osd_type: "proxy-reload" }
+	});
+
+	window.dispatchEvent(event);
+
+	reload_iframe(true);
+	proxy_changed = false;
 }
 
 // Select the frame element so it can be used later everywhere.
@@ -37,15 +69,18 @@ var isAOT = false;
 // Process the inputs from the config, including setting their initial value
 // from those stored in the config.
 document.querySelectorAll("#config input").forEach(function(el, i) {
+	var save    = true;
 	var section = el.getAttribute("config-area");
 	var key     = el.getAttribute("config-property");
 	var type    = el.getAttribute("type").toLowerCase();
 	var value   = config[section][key], new_value = null;
 
 	if ( type == "checkbox" ) { el.checked = value; }
+	else if ( type == "text" ) { el.value = value; }
 
 	el.addEventListener("change", function(e){
 		var temp = SCWP.config.get(section);
+		var old = SCWP.config.get(section);
 
 		if ( type == "checkbox" )
 		{
@@ -53,7 +88,40 @@ document.querySelectorAll("#config input").forEach(function(el, i) {
 			temp[key] = new_value;
 		}
 
-		SCWP.config.set(section, temp);
+		else if ( type == "text" )
+		{
+			new_value = e.target.value;
+			temp[key] = new_value;
+		}
+
+		// If something changes in the proxy config
+		if ( section == "proxy" )
+		{
+			if ( key == "custom" )
+			{
+				new_value = new_value.trim();
+				temp[key] = new_value;
+
+				if ( new_value == "" || valid_ipv4.test(new_value) )
+				{
+					proxy_changed = true;
+					console.log("VALID IP:PORT");
+				}
+				else { save = false; }
+			}
+
+			else if ( key == "active" )
+			{
+				proxy_changed = true;
+				console.log("Proxy status: ", value);
+			}
+		}
+
+		if ( save )
+		{
+			SCWP.config.set(section, temp);
+			config[section] = temp;
+		}
 	});
 
 	el.addEventListener("click", function(e) {
@@ -111,9 +179,10 @@ function fakefocus()
 	iframe.contentWindow.dispatchEvent(ibent);
 }
 
-function reload_iframe()
+function reload_iframe( suppress_osd = false )
 {
 	iframe.contentWindow.location.reload();
+	if ( suppress_osd ) { return; }
 
 	var event = new CustomEvent('osd-message', {
 		detail: {
@@ -131,6 +200,8 @@ function toggle_config()
 
 	elem_config.style.display = (display_prop == "none" ? "block" : "none");
 	elem_config.classList.toggle("hide");
+
+	if ( proxy_changed ) { handleProxyChange(); }
 }
 
 function toggle_fs()
@@ -262,6 +333,10 @@ window.addEventListener('osd-message', function (e) {
 	{
 		var status = (e.detail.aot_status ? "off" : "on");
 		OSD.new("Always on top " + status);
+	}
+	else if ( e.detail.osd_type == "proxy-reload" )
+	{
+		OSD.new("Proxy changed. Reloading...");
 	}
 	else
 	{

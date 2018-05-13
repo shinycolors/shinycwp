@@ -12,13 +12,17 @@
 			<div class="buttons left">
 				<span><a class="icon-config" style="cursor:pointer; text-decoration: none; color: inherit;" onclick="toggle_config()"></a>
 					<div id="config" style="display: none;">
-						<p>NOTE: Config on the proxy section won't be applied until you restart the app.</p>
+						<p><b>NOTE: Changes on the proxy section won't be applied until you close the config dialog.</b> Game will reload if changed.</p>
 						<h3>Proxy configuration</h3>
 						<div>
 							<p>If you have your own proxy or VPN set, you may disable this option to save traffic redirection and/or improve the speed.</p>
 							<label>
 								<input type="checkbox" config-area="proxy" config-property="active">
-								Activate proxy
+								Enable proxy
+							</label>
+							<p>You can also set your own proxy below<br>(leave blank to use built-in one).</p>
+							<label>
+								<input type="text" config-area="proxy" config-property="custom" maxlength="21" placeholder="ip:port format (will be validated)">
 							</label>
 						</div>
 						<h3>Sound configuration</h3>
@@ -36,15 +40,6 @@
 								<button class="button danger" config-custom="delete-cookies">Delete cookies</button>
 							</label>
 						</div>
-						<!-- <div>
-							<label>
-								<input type="checkbox" config-area="proxy" config-custom="allow-custom-proxy">
-								Use custom proxy
-							</label>
-							<label config-disabled="">
-								<input type="text" config-area="proxy" config-property="custom" placeholder="ip:port">
-							</label>
-						</div> -->
 					</div>
 				</span>
 				<span class="icon-refresh" onclick="reload_iframe()"></span>
@@ -53,7 +48,6 @@
 				<span class="icon-pin" onclick="toggle_aot()"></span>
 				<span class="icon-minimize" onclick="win.minimize()"></span>
 				<span class="icon-fullscreen" onclick="toggle_fs()"></span>
-				<!-- <span class="icon-max" onclick=""></span> -->
 				<span class="icon-close" onclick="nw.App.quit()"></span>
 			</div>
 		</div>
@@ -69,7 +63,7 @@
 
 			<p>You're advised NOT to use your main account as we aren't yet sure what does Enza/Bamco think about the translation mod or the client. In any case, use <b>at your own risk</b>.</p>
 			<p>Also, please note this software uses a third party japanese proxy, so be aware that,
-				<br>while we DO NOT collect any data, we can't prevent proxy doing such (worst of cases).
+				<br>while we DO NOT collect any data, we can't prevent proxy doing so (worst of cases).
 			</p>
 		
 			<p>Have fun.<br>— ShinyCWP dev team.</p>
