@@ -5,9 +5,23 @@ ShinyCWP is a fanmade desktop client (which is more like a simplified browser) t
 We're currently working with developers in [Hiori](https://github.com/shinycolors/Hiori) to translate menus and dialogs in the game as much as possible. If you wish to help and know Japanese or image editing, please support them, too.
 
 ### Features
+  * Minimal interface.
   * Less resource intensive.
-  * Automatic JP connection setup.
-  * ~~Desktop integration.~~
+  * Automatic japanese connection setup (*optional*).
+  * Game sound on non-focused window (*optional*).
+  * Always-on-top mode.
+  * Fullscreen mode.
+  * Account log-off (*cookie deletion*).
+
+### SCREENSHOT
+![ShinyCWP running](https://user-images.githubusercontent.com/38864859/39905184-a7641f04-54a1-11e8-884b-23d9df34a32d.png)
+*ShinyCWP running SC with Hiori and Hiori extension enabled.*
+
+### DOWNLOAD
+Installer: [Download](https://github.com/shinycolors/shinycwp/releases/download/1.3.0509.2/Shinycwp_installer.zip) (no admin privileges required)   
+Portable: [Download](https://github.com/shinycolors/shinycwp/releases/download/1.2.0502.1/Shinycwp_portable.zip)
+
+You can always head to the [Releases](https://github.com/shinycolors/shinycwp/releases) section to see changelog for each version.
   
 ## DISCLAIMER
 
