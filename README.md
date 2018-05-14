@@ -13,15 +13,23 @@ We're currently working with developers in [Hiori](https://github.com/shinycolor
   * Fullscreen mode.
   * Account log-off (*cookie deletion*).
 
-### SCREENSHOT
 ![ShinyCWP running](https://user-images.githubusercontent.com/38864859/39905184-a7641f04-54a1-11e8-884b-23d9df34a32d.png)
 *ShinyCWP running SC with Hiori and Hiori extension enabled.*
 
-### DOWNLOAD
-Installer: [Download](https://github.com/shinycolors/shinycwp/releases/download/1.3.0509.2/Shinycwp_installer.zip) (no admin privileges required)   
-Portable: [Download](https://github.com/shinycolors/shinycwp/releases/download/1.2.0502.1/Shinycwp_portable.zip)
+### Download
+|           | Link     | Notes                          |
+|-----------|----------|--------------------------------|
+| Installer | [Download](https://github.com/shinycolors/shinycwp/releases/download/1.3.0512.1/Shinycwp_installer.zip) | Admin privileges **not** required. |
+| Portable  | [Download](https://github.com/shinycolors/shinycwp/releases/download/1.3.0512.1/Shinycwp_portable.zip) | Please see update instructions below. |
 
-You can always head to the [Releases](https://github.com/shinycolors/shinycwp/releases) section to see changelog for each version.
+You can always head to the [Releases](https://github.com/shinycolors/shinycwp/releases) page to see changelog.
+
+#### Update instructions for **portable** version
+  1. Unzip new version in a folder.
+  2. Select the contents and copy them.
+  3. Go to the folder where you have the previous release.
+  4. Paste and accept the merging confirmation.
+  5. Confirm file replacement.
   
 ## DISCLAIMER
 
