@@ -10,8 +10,9 @@
 		<div id="menu-bar">
 			<div class="title">Idolm@ster Shiny Colors - ShinyCWP <span id="title-version"></span></div>
 			<div class="buttons left">
-				<span><a class="icon-config" style="cursor:pointer; text-decoration: none; color: inherit;" onclick="toggle_config()"></a>
-					<div id="config" style="display: none;">
+				<span class="dropdown-config">
+					<a class="icon-config" style="cursor:pointer; text-decoration: none; color: inherit;" onclick="toggle_config()"></a>
+					<div id="config" class="dialog" style="display: none;">
 						<p><b>NOTE: Changes on the proxy section won't be applied until you close the config dialog.</b> Game will reload if changed.</p>
 						<h3>Proxy configuration</h3>
 						<div>
@@ -43,6 +44,18 @@
 					</div>
 				</span>
 				<span class="icon-refresh" onclick="reload_iframe()"></span>
+				<span class="dropdown-updates">
+					<a id="updates" class="icon-notif-off" onclick="toggle_updates()"></a>
+					<div id="notifications" class="dialog" style="display: none;">
+						<h3>Update(s)</h3>
+						<span class="placeholder" style="text-align: center;">Nothing to show.</span>
+						<div class="template">
+							<h4></h4>
+							<span></span>
+							<a style="display: none"></a>
+						</div>
+					</div>
+				</span>
 			</div>
 			<div class="buttons right">
 				<span class="icon-pin" onclick="toggle_aot()"></span>

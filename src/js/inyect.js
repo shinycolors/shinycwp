@@ -1,19 +1,115 @@
+/**
+ * inyect.js
+ *    For you, who likes to read source code.
+ *    
+ *    If you are from the "new JS generation" (ES6+, classes, npm, frameworks, etc.)
+ *    this code will most likely trigger your senses as it's pure -not well organized-
+ *    vainilla JavaScript that mixes a lot of (bad) programming practises. I'm sorry.
+ */
+
 // Node libraries
 const fs = require("fs");
+const version = nw.App.manifest.version;
 
-document.getElementById('title-version').innerText = nw.App.manifest.version;
+document.getElementById('title-version').innerText = version;
 
 // Adquire config so it can be applied to any element on init
 var config = SCWP.config.get_all();
+var remote = null;
 
 var proxy_changed = false;
 var valid_ipv4 = /^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(?:\:[\d]{1,6})?$/g;
 
-var bench_start = Date.now(); // [!DEBUG]
+//var bench_start = Date.now(); // [!DEBUG]
 
-// If the proxy is active in the config...
-function proxyConfig( config_obj )
+function procRemoteInfo()
 {
+	if ( !remote ) { return; }
+
+	var shadow = null, count = 0;
+	var QS = function(e) {return shadow.querySelector(e);}
+
+	function createNotification( data )
+	{
+		// Create new instance of template and remove template properties.
+		shadow = document.querySelector("#notifications > .template").cloneNode(true);
+		shadow.classList.remove("template");
+
+		// Edit its contents according to remote info.
+		QS("h4").innerText = data.title;
+		QS("span").innerText = data.text;
+
+		// Create link with external browser handling.
+		if ( data.url )
+		{
+			var link = QS("a");
+			link.href = atob(data.url);
+			link.style.display = "block";
+			link.onclick = function(e) { nw.Shell.openExternal(this.href); return false; }
+		}
+
+		// Append the new notification and increase counter.
+		document.getElementById("notifications").appendChild(shadow);
+		count++;
+	}
+
+	if ( remote.app.version > version )	
+	{
+		createNotification({
+			title: "Update available (v." + remote.app.version + ")",
+			text: "Click here to go to download site.",
+			url: remote.app.update.url
+		});
+	}
+
+	var notifs = remote.notifications;
+	for ( var i in notifs )
+	{
+		// If there isn't a min version OR there is min version and such is less than actual AND
+		// If there isn't a max version OR there is max version and such is greater than actual..
+		if ( (!notifs[i].minVer || notifs[i].minVer <= version) &&
+			 (!notifs[i].maxVer || notifs[i].maxVer >= version) )
+		{
+			createNotification({
+				title: notifs[i].content.title || "Notice",
+				text:  notifs[i].content.text,
+				url:   notifs[i].content.url
+			});
+		}
+	}
+
+	if ( count ) {
+		var elem = document.querySelector(".dropdown-updates > a");
+			elem.classList.add("icon-notif");
+
+		document.querySelector("#notifications > .placeholder").style.display = "none";
+	}
+}
+
+function getUpdateInfo()
+{
+	var url = __REMOTE_APP_URL__;
+	var opt = {
+		cache: "no-cache, no-store, must-revalidate",
+		credentials: "same-origin",
+		headers: {
+			"pragma": "no-cache"
+		}
+	};
+
+	fetch(url, opt)
+		.then(response => response.json())
+			.then(jsondata => { 
+				remote = jsondata;
+				procRemoteInfo();
+			});
+}
+
+
+
+function setProxyConfig( config_obj )
+{
+	// If the proxy is active in the config...
 	if ( config_obj.active )
 	{
 		// Base load url using built-in proxy.
@@ -36,15 +132,15 @@ function proxyConfig( config_obj )
 	}
 }
 
-proxyConfig(config.proxy);
+setProxyConfig(config.proxy);
 
-console.log("Proxy config took " + (Date.now() - bench_start) + " ms to load"); // [!DEBUG]
+//console.log("Proxy config took " + (Date.now() - bench_start) + " ms to load"); // [!DEBUG]
 
 function handleProxyChange() {
 	// Always retrieve last version.
 	var proxy_config = SCWP.config.get("proxy");
 
-	if ( proxy_config.active ) { proxyConfig(proxy_config); }
+	if ( proxy_config.active ) { setProxyConfig(proxy_config); }
 	else { nw.App.setProxyConfig(""); }
 
 	var event = new CustomEvent('osd-message', {
@@ -105,7 +201,7 @@ document.querySelectorAll("#config input").forEach(function(el, i) {
 				if ( new_value == "" || valid_ipv4.test(new_value) )
 				{
 					proxy_changed = true;
-					console.log("VALID IP:PORT");
+					//console.log("VALID IP:PORT"); // [!DEBUG]
 				}
 				else { save = false; }
 			}
@@ -113,7 +209,7 @@ document.querySelectorAll("#config input").forEach(function(el, i) {
 			else if ( key == "active" )
 			{
 				proxy_changed = true;
-				console.log("Proxy status: ", value);
+				//console.log("Proxy status: ", value); // [!DEBUG]
 			}
 		}
 
@@ -204,6 +300,15 @@ function toggle_config()
 	if ( proxy_changed ) { handleProxyChange(); }
 }
 
+function toggle_updates()
+{
+	var elem_updates = document.getElementById("notifications");
+	var display_prop = elem_updates.style.display;
+
+	elem_updates.style.display = (display_prop == "none" ? "block" : "none");
+	elem_updates.classList.toggle("hide");
+}
+
 function toggle_fs()
 {
 	if ( isAOT ) { toggle_aot(); }
@@ -279,10 +384,6 @@ document.querySelector('#iframe').onload = function()
 
 		hook_SM();
 	}
-
-	// Bind custom notifications API so It can have future uses like
-	// Stamina tracking notifications, etc.
-	// Yk_notif.bind(iframe.contentWindow); // [!REV] not using rn
 
 	// Bind basic keyboard commands to app
 	iframe.contentDocument.onkeydown = function(e) {
@@ -371,6 +472,8 @@ win.on("resize", function(w, h) {
 // After the blank window loads properly, and network settings
 // are properly set, we then set the source to load SC.
 win.on("loaded", function() {
+	getUpdateInfo();
+
 	iframe.src = "https://shinycolors.enza.fun";
 
 	var read_timeout = 6500, anim_ms = 2001;
