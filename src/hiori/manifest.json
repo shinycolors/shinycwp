@@ -9,6 +9,7 @@
     "webRequestBlocking",
     "*://shinycolors.enza.fun/*"
   ],
+  "options_page": "html/options.html",
   "background": {
     "scripts": [
       "background.js"
@@ -30,6 +31,6 @@
   ],
   "name": "SC3",
   "short_name": "SC3",
-  "version": "0.2.0",
+  "version": "0.4.5",
   "description": "Shiny Colors translation project"
 }
