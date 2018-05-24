@@ -17,10 +17,10 @@ We're currently working with developers in [Hiori](https://github.com/shinycolor
 *ShinyCWP running SC with Hiori and Hiori extension enabled.*
 
 ### Download
-|           | Link     | Notes                          |
-|-----------|----------|--------------------------------|
-| Installer | [Download](https://github.com/shinycolors/shinycwp/releases/download/1.3.0520.2/Shinycwp_installer.zip) | Admin privileges **not** required. |
-| Portable  | [Download](https://github.com/shinycolors/shinycwp/releases/download/1.3.0520.2/Shinycwp_portable.zip) | Please see update instructions below. |
+|           | Version | Architecture | Link     | Notes                          |
+|-----------|---------|--------------|----------|--------------------------------|
+| Installer | 1.3.0520.2 | 64bit | [Download](https://github.com/shinycolors/shinycwp/releases/download/1.3.0520.2/Shinycwp_installer.zip) | Admin privileges **not** required. |
+| Portable  | 1.3.0520.2 | 64bit | [Download](https://github.com/shinycolors/shinycwp/releases/download/1.3.0520.2/Shinycwp_portable.zip) | Please see update instructions below. |
 
 You can always head to the [Releases](https://github.com/shinycolors/shinycwp/releases) page to see changelog.
 
