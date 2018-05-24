@@ -2,7 +2,8 @@ if ( typeof SCWP !== "object" ) { SCWP = {}; }
 SCWP.config = {
 	_default: {
 		proxy: { active: true, custom: null },
-		sound: { afk_mute: false }
+		sound: { afk_mute: false },
+		hiori: { dialogs: true }
 	},
 
 	_cache: {},

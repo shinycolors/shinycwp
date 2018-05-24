@@ -356,10 +356,16 @@ document.querySelector('#iframe').onload = function()
 	// Verify if frame domain is from ShinyColors
 	if ( iframe.contentDocument.location.hostname.indexOf("shinycolors.enza.fun") != -1 )
 	{
-		// Inject the script directly into the frame, as we are not isolated.
-		var script = iframe.contentDocument.createElement("script");
-		script.src = chrome.extension.getURL("hiori/injects.js");
-		iframe.contentDocument.head.appendChild(script);
+		// Get Hiori config
+		var hiori_conf = SCWP.config.get("hiori");
+
+		if ( hiori_conf.dialogs )
+		{
+			// Inject the script directly into the frame, as we are not isolated.
+			var script = iframe.contentDocument.createElement("script");
+			script.src = chrome.extension.getURL("hiori/injects.js");
+			iframe.contentDocument.head.appendChild(script);
+		}
 
 		var _inj_timer = null;
 
@@ -386,7 +392,7 @@ document.querySelector('#iframe').onload = function()
 	}
 
 	// Bind basic keyboard commands to app
-	iframe.contentDocument.onkeydown = function(e) {
+	document.onkeydown = function(e) {
 		// Esc
 		if ( e.which == 27 )
 		{
@@ -394,8 +400,8 @@ document.querySelector('#iframe').onload = function()
 			if ( fullscreen ) { e.preventDefault(); toggle_fs(); }
 		}
 
-		// F11
-		if ( e.which == 122 )
+		// F11 or Alt + Enter
+		if ( e.which == 122 || e.altKey == true && e.which == 13 )
 		{
 			e.preventDefault(); toggle_fs(); 
 		}
@@ -411,6 +417,12 @@ document.querySelector('#iframe').onload = function()
 		{
 			e.preventDefault(); toggle_aot();
 		}
+	}
+
+	// Hook iframe keydown and replicate/dispatch its events back to our app
+	iframe.contentDocument.onkeydown = function(e) {
+		new_e = new e.constructor(e.type, e);
+		document.dispatchEvent(new_e);
 	}
 
 	// We change the focus of the document to the iframe, so that
