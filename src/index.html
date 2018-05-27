@@ -16,7 +16,9 @@
 						<p><b>NOTE: Changes on the proxy section won't be applied until you close the config dialog.</b> Game will reload if changed.</p>
 						<h3>Proxy configuration</h3>
 						<div>
-							<p>If you have your own proxy or VPN set, you may disable this option to save traffic redirection and/or improve the speed.</p>
+							<p>The client by default uses a custom proxy to set a japanese connection and run the game. If you've already set a system-wide proxy or VPN, you may disable this option to improve speed.
+								<br><br><i>Disabling this also deactivates the custom proxy.</i>
+							</p>
 							<label>
 								<input type="checkbox" config-area="proxy" config-property="active">
 								Enable proxy
@@ -49,9 +51,8 @@
 						<h3>Browser data</h3>
 						<div>
 							<p>Please keep the Shift key pressed when clicking the button to apply the action.<br>Game may be reloaded after process is done.</p>
-							<label>
-								<button class="button danger" config-custom="delete-cookies">Delete cookies</button>
-							</label>
+							<button class="button danger" config-custom="delete-cookies">Delete cookies</button><!-- whitespace fix
+							--><button class="button" config-custom="delete-cache">Delete cache</button>
 						</div>
 					</div>
 				</span>
@@ -62,8 +63,7 @@
 						<h3>Update(s)</h3>
 						<span class="placeholder" style="text-align: center;">Nothing to show.</span>
 						<div class="template">
-							<h4></h4>
-							<span></span>
+							<h4></h4><span></span>
 							<a style="display: none"></a>
 						</div>
 					</div>

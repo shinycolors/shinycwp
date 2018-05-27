@@ -11,24 +11,57 @@
 const fs = require("fs");
 const version = nw.App.manifest.version;
 
+// Set version in title bar
 document.getElementById('title-version').innerText = version;
 
-// Adquire config so it can be applied to any element on init
-var config = SCWP.config.get_all();
-var remote = null;
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ * ## GLOBAL VARIABLES
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ */
 
-var proxy_changed = false;
+var iframe = document.getElementById('iframe'); // Game iframe
+var config = SCWP.config.get_all(); // Config
+
+var remote = null, rnd_proxind = -1, retries = 0, proxy_changed = false, isAOT = false;
+
 var valid_ipv4 = /^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(?:\:[\d]{1,6})?$/g;
 
-//var bench_start = Date.now(); // [!DEBUG]
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ * ## UPDATE/NOtIF UTILITIES
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ */
 
+// Get the remote info and save it in the remote var
+function getUpdateInfo()
+{
+	var url = __REMOTE_APP_URL__;
+	var opt = {
+		cache: "no-cache, no-store, must-revalidate",
+		credentials: "same-origin",
+		headers: {
+			"pragma": "no-cache"
+		}
+	};
+
+	fetch(url, opt)
+		.then(response => response.json())
+		.then(jsondata => { 
+			remote = jsondata;
+			procRemoteInfo();
+		});
+}
+
+// Extremely long function to process remote info
 function procRemoteInfo()
 {
+	// If there isn't any config set in the remote var, quit
 	if ( !remote ) { return; }
 
+	// Init variables and set a shortcut for shadow's querySelector
 	var shadow = null, count = 0;
 	var QS = function(e) {return shadow.querySelector(e);}
 
+	// Local function to create a new notification in the dialog.
 	function createNotification( data )
 	{
 		// Create new instance of template and remove template properties.
@@ -53,6 +86,7 @@ function procRemoteInfo()
 		count++;
 	}
 
+	// If there's a new version greater than actual one
 	if ( remote.app.version > version )	
 	{
 		createNotification({
@@ -62,6 +96,7 @@ function procRemoteInfo()
 		});
 	}
 
+	// Get notifications and iterate through them
 	var notifs = remote.notifications;
 	for ( var i in notifs )
 	{
@@ -78,34 +113,27 @@ function procRemoteInfo()
 		}
 	}
 
+	// If there's at least one notification...
 	if ( count ) {
+		// Select the notif icon link and add "on" icon
 		var elem = document.querySelector(".dropdown-updates > a");
 			elem.classList.add("icon-notif");
 
+		// Remote placeholder
 		document.querySelector("#notifications > .placeholder").style.display = "none";
 	}
+
+	// Set the remote proxy list from the remote and save it the config
+	var proxy_config = SCWP.config.get("proxy");
+	proxy_config.cache_list = remote.shipuroku;
+
+	SCWP.config.set("proxy", proxy_config);
 }
 
-function getUpdateInfo()
-{
-	var url = __REMOTE_APP_URL__;
-	var opt = {
-		cache: "no-cache, no-store, must-revalidate",
-		credentials: "same-origin",
-		headers: {
-			"pragma": "no-cache"
-		}
-	};
-
-	fetch(url, opt)
-		.then(response => response.json())
-			.then(jsondata => { 
-				remote = jsondata;
-				procRemoteInfo();
-			});
-}
-
-
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ * ## PROXY HANDLING
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ */
 
 function setProxyConfig( config_obj )
 {
@@ -132,11 +160,42 @@ function setProxyConfig( config_obj )
 	}
 }
 
-setProxyConfig(config.proxy);
+// Function to set a new proxy from the remote list
+function tryAltProxy()
+{
+	// Get non-cached version of proxy config
+	var proxy_config = SCWP.config.get("proxy", false);
+	//var hasCustom = (proxy_config.custom ? true : false);
 
-//console.log("Proxy config took " + (Date.now() - bench_start) + " ms to load"); // [!DEBUG]
+	// if there's a cache list from remote
+	if ( proxy_config.cache_list )
+	{
+		// Get length and randomize between 0 and len
+		var len = proxy_config.cache_list.length - 1;
+		rnd_proxind = Math.floor( Math.random() * len );
 
-function handleProxyChange() {
+		// Set custom proxy to a random in the list
+		proxy_config.custom = proxy_config.cache_list[rnd_proxind];
+
+		// Use this data and set it using the method
+		setProxyConfig(proxy_config);
+
+		// Create OSD event and dispotch
+		var event = new CustomEvent('osd-message', {
+			detail: { osd_type: "proxy-fallback" }
+		});
+		window.dispatchEvent(event);
+
+		// Reload the iframe in the current location (without OSD)
+		reload_iframe(true);
+
+		// Save the config, so next time (hopefully) we don't run into this problem
+		SCWP.config.set("proxy", proxy_config);
+	}
+}
+
+function handleProxyChange()
+{
 	// Always retrieve last version.
 	var proxy_config = SCWP.config.get("proxy");
 
@@ -153,9 +212,6 @@ function handleProxyChange() {
 	proxy_changed = false;
 }
 
-// Select the frame element so it can be used later everywhere.
-var iframe = document.getElementById('iframe');
-var isAOT = false;
 
 /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  * ## CONFIG RELATED INITS
@@ -234,6 +290,10 @@ document.querySelectorAll("#config button").forEach(function(el, i) {
 			delete_all_cookies(); 
 			toggle_config();
 		}
+		else if ( action == "delete-cache" && e.shiftKey == true ) {
+			nw.App.clearCache();
+			toggle_config();
+		}
 	});
 });
 
@@ -241,6 +301,26 @@ document.querySelectorAll("#config button").forEach(function(el, i) {
  * ## GOBAL HELPER FUNCTIONS
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  */
+
+function hide_notice()
+{
+	var read_timeout = 6500, anim_ms = 2001;
+	var prem = document.getElementById("pre-message");
+
+	var timer = null;
+	
+	// Hide the preload message screen after read_timeout milisecs
+	// please pay attention to the duration of the hide animation on 'styles.css'
+	timer = setTimeout(function() {
+		prem.classList.add("hide");
+		iframe.focus();
+
+		// Save some memory (?)
+		timer = setTimeout(function() { 
+			prem.style.display = "none";
+		}, anim_ms);
+	}, read_timeout);
+}
 
 function delete_all_cookies()
 {
@@ -277,6 +357,7 @@ function fakefocus()
 
 function reload_iframe( suppress_osd = false )
 {
+	iframe.contentWindow.stop();
 	iframe.contentWindow.location.reload();
 	if ( suppress_osd ) { return; }
 
@@ -345,6 +426,11 @@ function toggle_aot()
 	}
 }
 
+function bench_result(start_time, section = "Load")
+{
+	console.log(section + " took " + (Date.now() - bench_start) + " ms."); // [!DEBUG]
+}
+
 /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  * ## SC FRAME ONLOAD INJECTS
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -353,20 +439,40 @@ function toggle_aot()
 // Every time the outerframe of the iframe loads a page...
 document.querySelector('#iframe').onload = function()
 {
+	// Check if the frame loaded is a Chrome error page
+	if ( iframe.contentDocument.body.classList.contains("neterror") )
+	{
+		var err_cod = iframe.contentDocument.getElementsByClassName("error-code")[0];
+
+		// If error is related to proxy or tunneling...
+		if ( err_cod.innerText.indexOf("ERR_PROXY") != -1 ||
+			 err_cod.innerText.indexOf("ERR_TUNNEL") != -1 )
+		{
+			// Check retry count, if it's only first time, reload and finish.
+			if ( retries < 1 ) { reload_iframe(); retries++; return; }
+
+			// Call function to try alternate proxy.
+			//console.error("Proxy error detected."); // [!DEBUG]
+			tryAltProxy();
+		}
+	}
+
 	// Verify if frame domain is from ShinyColors
-	if ( iframe.contentDocument.location.hostname.indexOf("shinycolors.enza.fun") != -1 )
+	else if ( iframe.contentDocument.location.hostname.indexOf("shinycolors.enza.fun") != -1 )
 	{
 		// Get Hiori config
 		var hiori_conf = SCWP.config.get("hiori");
 
+		// If config is set to enable dialog translations...
 		if ( hiori_conf.dialogs )
 		{
-			// Inject the script directly into the frame, as we are not isolated.
+			// Inject the script directly into the frame content.
 			var script = iframe.contentDocument.createElement("script");
 			script.src = chrome.extension.getURL("hiori/injects.js");
 			iframe.contentDocument.head.appendChild(script);
 		}
 
+		// Start a timer to hook their sound manager so that we can unmute the window.
 		var _inj_timer = null;
 
 		function hook_SM()
@@ -430,32 +536,6 @@ document.querySelector('#iframe').onload = function()
 	iframe.focus();
 }
 
-// [!REV] move to OSD.js
-// Listen to OSD messages
-window.addEventListener('osd-message', function (e) {
-	if ( e.detail.osd_type == "fullscreen" )
-	{
-		var status = (e.detail.fs_status ? "off" : "on (ESC or F11 to exit)");
-		OSD.new("Fullscreen " + status);
-	}
-	else if ( e.detail.osd_type == "reload" )
-	{
-		OSD.new("Reloading...");
-	}
-	else if ( e.detail.osd_type == "aot" )
-	{
-		var status = (e.detail.aot_status ? "off" : "on");
-		OSD.new("Always on top " + status);
-	}
-	else if ( e.detail.osd_type == "proxy-reload" )
-	{
-		OSD.new("Proxy changed. Reloading...");
-	}
-	else
-	{
-		console.log("Uncaught type" + e.detail.osd_type);
-	}
-});
 
 /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  * ## NWJS WINDOW EVENTS
@@ -484,24 +564,25 @@ win.on("resize", function(w, h) {
 // After the blank window loads properly, and network settings
 // are properly set, we then set the source to load SC.
 win.on("loaded", function() {
+	// Call function to retrieve updates.
 	getUpdateInfo();
 
+	// Load main url and hide the startup notice.
 	iframe.src = "https://shinycolors.enza.fun";
+	hide_notice();
 
-	var read_timeout = 6500, anim_ms = 2001;
-	var prem = document.getElementById("pre-message");
-
-	var timer = null;
-	
-	// Hide the preload message screen after read_timeout milisecs
-	// please pay attention to the duration of the hide animation on 'estilos.css'
-	timer = setTimeout(function() {
-		prem.classList.add("hide");
-		iframe.focus();
-
-		// Save some memory (?)
-		timer = setTimeout(function() { 
-			prem.style.display = "none";
-		}, anim_ms);
-	}, read_timeout);
+	//bench_result(bench_start, "Window load event"); // [!DEBUG]
 });
+
+
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ * ## INIT CALLS
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ */
+
+//var bench_start = Date.now(); // [!DEBUG]
+
+setProxyConfig(config.proxy);
+OSD.bind(window);
+
+//bench_result(bench_start, "Init calls"); // [!DEBUG]
