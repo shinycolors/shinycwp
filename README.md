@@ -19,8 +19,9 @@ We're currently working with developers in [Hiori](https://github.com/shinycolor
 ### Download
 |           | Version | Architecture | Link     | Notes                          |
 |-----------|---------|--------------|----------|--------------------------------|
-| Installer | 1.3.0520.2 | 64bit | [Download](https://github.com/shinycolors/shinycwp/releases/download/1.3.0520.2/Shinycwp_installer.zip) | Admin privileges **not** required. |
-| Portable  | 1.3.0520.2 | 64bit | [Download](https://github.com/shinycolors/shinycwp/releases/download/1.3.0520.2/Shinycwp_portable.zip) | Please see update instructions below. |
+| Installer | 1.3.0612.1 | 64bit | [Download](https://github.com/shinycolors/shinycwp/releases/download/1.3.0612.1/Shinycwp_installer.zip) | Admin privileges **not** required. |
+| Portable  | 1.3.0612.1 | 64bit | [Download](https://github.com/shinycolors/shinycwp/releases/download/1.3.0612.1/Shinycwp_portable.zip) | Please see update instructions below. |
+| Portable  | 1.3.0612.1 | 32bit | [Download](https://github.com/shinycolors/shinycwp/releases/download/1.3.0612.1/Shinycwp_portable_32.zip) | 32 bit version is *experimental*.<br/>Game data/cache is **not** shared with 64 bits version. |
 
 You can always head to the [Releases](https://github.com/shinycolors/shinycwp/releases) page to see changelog.
 
