@@ -42,6 +42,10 @@ OSD.bind = function(elem)
 		{
 			OSD.new("Main proxy couldn't connect. Trying alternate...");
 		}
+		else if ( e.detail.osd_type == "proxy-over" )
+		{
+			OSD.new("No proxies alive, please report in Discord");
+		}
 		else
 		{
 			console.log("Uncaught type" + e.detail.osd_type);

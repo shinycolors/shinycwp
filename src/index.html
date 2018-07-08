@@ -4,6 +4,7 @@
 		<meta charset="utf-8">
 		<link rel="stylesheet" type="text/css" href="css/styles.css">
 		<script type="text/javascript">var win = nw.Window.get();</script>
+		<script type="text/javascript" src="js/config.js"></script>
 	</head>
 
 	<body>
@@ -35,10 +36,21 @@
 								<input type="checkbox" config-area="hiori" config-property="dialogs">
 								Translate dialog/names (where available)
 							</label>
-							<!--<label>
-								<input type="checkbox" checked disabled>
+							<p>Disabling menu translation <b>helps when a game update breaks the translated textures and/or screen freezes</b> when loading a new screen.
+								<br>A reload (F5) might be needed for changes to take effect.</p>
+							<label>
+								<input type="checkbox" config-area="hiori" config-property="menus">
 								Translate menus
-							</label>-->
+							</label>
+							<!-- <p>Select the language for translations (currently menus only).</p>
+							<label>
+								<select id="lang-sel" onchange="handleLang(this)">
+									<option disabled selected>Not changed</option>
+									<option value="en_us">English</option>
+									<option value="ko_kr">Korean</option>
+								</select>
+								Language (experimental)
+							</label> -->
 						</div>
 						<h3>Sound configuration</h3>
 						<div>
@@ -105,7 +117,6 @@
 		</div>
 
 		<iframe draggable="false" id="iframe" scrolling="no" nwfaketop></iframe>
-		<script type="text/javascript" src="js/config.js"></script>
 		<script type="text/javascript" src="js/OSD.js"></script>
 		<script type="text/javascript" src="js/inyect.js"></script>
 	</body>

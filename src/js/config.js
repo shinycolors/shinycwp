@@ -3,25 +3,31 @@ SCWP.config = {
 	_default: {
 		proxy: { active: true, custom: null, cache_list: [] },
 		sound: { afk_mute: false },
-		hiori: { dialogs: true }
+		hiori: { dialogs: true, menus: true },
 	},
 
 	_cache: {},
 
-	merge: function(obj1, obj2) {
-		//console.log("Merging\n", obj1, "\nwith\n", obj2); // [!DEBUG]
+	merge: function(obj1, obj2, name1 = 'obj1', name2 = 'obj2')
+	{
+		// For each object/property from object 2...
 		for (var p in obj2) 
 		{
+			//console.log("Merging property '" + p + "'");
 			try 
 			{
-				// Property in destination object set; update its value.
 				if ( obj2[p].constructor == Object ) {
-					obj1[p] = extend(obj1[p], obj2[p]);
+					//console.info("---- recurse -----"); // [!DEBUG]
+					obj1[p] = this.merge(obj1[p], obj2[p], name1, name2);
 				} else {
+					// [!DEBUG]
+					//console.log(name1 + "." + p + " '" + obj1[p] + 
+					//            "' will now be '" + obj2[p] + "'");
 					obj1[p] = obj2[p];
 				}
 
 			}
+			// non-existing property/invalid existing property
 			catch(e) { obj1[p] = obj2[p]; }
 		}
 
@@ -30,15 +36,14 @@ SCWP.config = {
 
 	load: function()
 	{
-		var config = localStorage.getItem("config") || JSON.stringify(this._default);
-		config = JSON.parse(config);
+		// Load config from localStorage or defaults if not available, then process the data as JSON 
+		var stored_conf = localStorage.getItem("scwp_config") || JSON.stringify(this._default);
+		stored_conf = JSON.parse(stored_conf);
 
-		var temp = this._default;
-		this.merge(temp, config);
+		var def = JSON.parse(JSON.stringify(this._default));
+		this.merge(def, stored_conf, "def", "stored_conf");
 
-		config = temp;
-
-		return config;
+		return def;
 	},
 
 	get_all: function() { return this.load(); },
@@ -60,7 +65,7 @@ SCWP.config = {
 		config[secc] = objdata;
 
 		this._cache[secc] = config[secc];
-		localStorage.setItem("config", JSON.stringify(config));
+		localStorage.setItem("scwp_config", JSON.stringify(config));
 	},
 
 	def: function(secc, prop)

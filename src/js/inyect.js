@@ -26,6 +26,17 @@ var remote = null, rnd_proxind = -1, retries = 0, proxy_changed = false, isAOT =
 
 var valid_ipv4 = /^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(?:\:[\d]{1,6})?$/g;
 
+// Initial check to enable or disable background page menu translation hooks.
+if ( nw.App.argv.indexOf("--hiori-disable") != -1 || config.hiori.menus === false )
+{
+	chrome.runtime.sendMessage({scwp: hiori_config}, function(response) {
+		if ( response == "done" )
+		{
+			console.log("Menu translation disabled by config");
+		}
+	});
+};
+
 /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  * ## UPDATE/NOtIF UTILITIES
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -170,9 +181,25 @@ function tryAltProxy()
 	// if there's a cache list from remote
 	if ( proxy_config.cache_list )
 	{
+		// If there was already a random id from a proxy that failed to connect,
+		// remove it from this session and continue to try with remaining ones.
+		if ( rnd_proxind != -1 )
+		{
+			proxy_config.cache_list.splice(rnd_proxind, 1);
+		}
+
 		// Get length and randomize between 0 and len
 		var len = proxy_config.cache_list.length - 1;
 		rnd_proxind = Math.floor( Math.random() * len );
+
+		if (len <= 0) {
+			var event = new CustomEvent('osd-message', {
+				detail: { osd_type: "proxy-over" }
+			});
+			window.dispatchEvent(event);
+
+			return;	
+		}
 
 		// Set custom proxy to a random in the list
 		proxy_config.custom = proxy_config.cache_list[rnd_proxind];
@@ -212,11 +239,32 @@ function handleProxyChange()
 	proxy_changed = false;
 }
 
+function handleHioriChange(reload = false)
+{
+	// Always retrieve last version.
+	var hiori_config = SCWP.config.get("hiori");
+
+	chrome.runtime.sendMessage({scwp: hiori_config}, function(response) {
+		console.log(response);
+	});
+}
 
 /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  * ## CONFIG RELATED INITS
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  */
+
+function handleLang(elem)
+{
+	var hiori_config = localStorage.getItem("config");
+		hiori_config = JSON.parse(hiori_config);
+
+	if ( hiori_config.global && hiori_config.global.lang )
+	{
+		hiori_config.global.lang = elem.value;
+		localStorage.setItem("config", JSON.stringify(hiori_config));
+	}
+}
 
 // Process the inputs from the config, including setting their initial value
 // from those stored in the config.
@@ -302,6 +350,21 @@ document.querySelectorAll("#config button").forEach(function(el, i) {
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  */
 
+function restart_app()
+{
+	var path = require('path');
+	var nwPath = process.argv[0];
+	var nwDir = path.dirname(nwPath);
+	var appPath = process.cwd();
+
+	var spawn = require('child_process').spawn;
+
+	var _pro = spawn(nwPath, {detached: true, stdio: 'ignore'});
+
+	_pro.unref();
+	nw.App.quit();
+}
+
 function hide_notice()
 {
 	var read_timeout = 6500, anim_ms = 2001;
@@ -379,6 +442,7 @@ function toggle_config()
 	elem_config.classList.toggle("hide");
 
 	if ( proxy_changed ) { handleProxyChange(); }
+	if ( display_prop == "block" ) { handleHioriChange(); }
 }
 
 function toggle_updates()
